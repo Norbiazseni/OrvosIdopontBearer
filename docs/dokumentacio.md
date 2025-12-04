@@ -103,6 +103,10 @@ DELETE `/patients/{id}` — törlés (csak admin)
 
 ## Doctors (orvosok)
 
+<img width="268" height="135" alt="image" src="https://github.com/user-attachments/assets/f0380069-118a-46c9-acc1-1c99378feb60" />
+
+
+
 GET `/doctors` — lista (minden user láthatja)
 GET `/doctors/{id}` — részletek
 
@@ -123,6 +127,10 @@ DELETE `/doctors/{id}` — törlés (csak admin)
 ---
 
 ## Appointments (időpontok)
+
+<img width="288" height="141" alt="image" src="https://github.com/user-attachments/assets/5ee0e6a6-ca86-40c2-af9e-50e624b5d047" />
+
+
 
 GET `/appointments` — lista
 - admin: minden időpont
