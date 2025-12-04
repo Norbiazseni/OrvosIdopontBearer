@@ -24,17 +24,20 @@ Rövid, tömör API dokumentáció a projekt végpontjaihoz és használatához.
 - POST `/register` — felhasználó regisztráció
 - POST `/login` — bejelentkezés, visszaadja a Bearer tokent
 
+<img width="564" height="281" alt="image" src="https://github.com/user-attachments/assets/6fc19004-4f96-4831-bf96-7c4020a6fca1" />
+
+
 Példa /login kérés:
 Content-Type: application/json
 ```
 Body:
 {
-  "email": "user@example.com",
+  "email": "liliane47@example.com",
   "password": "password"
 }
 Példa válasz:
 {
-  "token": "plain-text-token"
+    "token": "3|CxgDpQXEol85wrdwlgoVJbhZ2mJGEVENZd7c48C2a54f3084"
 }
 ```
 ---
