@@ -139,6 +139,9 @@ Response: 401 Unauthorized
 ## Factory, Seedelés és Tesztelés
 
 - Factories és seederek használata: database/seeders/DatabaseSeeder.php és factories mappában.
+- Futtatás helyben: php artisan migrate:fresh --seed majd php artisan test
+- Tesztek API hívásokat imitálnak: actingAs($user) vagy tokennel withHeaders(['Authorization' => 'Bearer '.$token])
+
 ### Factory-k:
 
 **-AppointmentFactory.php**
@@ -267,7 +270,7 @@ Ez a UserFactory automatikusan létrehoz felhasználókat teszteléshez vagy see
 
 ## Seedelés:
 
-Ez a DatabaseSeeder felelős az adatbázis feltöltéséért tesztelés vagy fejlesztés során. Létrehoz:
+Ez a **DatabaseSeeder** felelős az adatbázis feltöltéséért tesztelés vagy fejlesztés során. Létrehoz:
 
 1. Felhasználókat – 3 admin és 3 normál user.
 2. Pácienseket – 10 darab véletlenszerű rekord.
@@ -314,8 +317,13 @@ class DatabaseSeeder extends Seeder
 }
 ```
 
+## Tesztelés
 
-- Futtatás helyben: php artisan migrate:fresh --seed majd php artisan test
-- Tesztek API hívásokat imitálnak: actingAs($user) vagy tokennel withHeaders(['Authorization' => 'Bearer '.$token])
+<img width="647" height="132" alt="image" src="https://github.com/user-attachments/assets/28ab8f3b-61fd-4d49-ac75-87715e4e9cf8" />
+
+12 tesztet tartalmaz, melyek közül mind sikerrel lefut.
+
+
+
 
 
