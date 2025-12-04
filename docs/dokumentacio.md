@@ -26,6 +26,7 @@ Rövid, tömör API dokumentáció a projekt végpontjaihoz és használatához.
 
 Példa /login kérés:
 Content-Type: application/json
+```
 Body:
 {
   "email": "user@example.com",
@@ -35,7 +36,7 @@ Példa válasz:
 {
   "token": "plain-text-token"
 }
-
+```
 ---
 
 ## Védett végpontok (auth:sanctum)
@@ -60,11 +61,13 @@ GET `/patients/{id}` — részletek (403, ha nincs jogosultság)
 
 POST `/patients` — létrehozás (csak admin)
 Body (példa):
+```
 {
   "name": "Név",
   "email": "email@example.com",
   "birth_date": "YYYY-MM-DD"
 }
+```
 Válasz: 201 Created + patient objektum
 
 PUT `/patients/{id}` — teljes frissítés (csak admin)
@@ -79,11 +82,13 @@ GET `/doctors/{id}` — részletek
 
 POST `/doctors` — létrehozás (csak admin)
 Body:
+```
 {
   "name": "Dr. Név",
   "specialization": "szakterület",
   "room": "101"
 }
+```
 
 PUT `/doctors/{id}` — módosítás (csak admin)
 DELETE `/doctors/{id}` — törlés (csak admin)
@@ -103,12 +108,14 @@ GET `/appointments/{id}` — részletek (403, ha nem jogosult)
 
 POST `/appointments` — létrehozás (jelen implementáció: csak admin hozhat létre)
 Body:
+```
 {
   "patient_id": 1,
   "doctor_id": 2,
   "appointment_time": "2025-12-20 10:00:00",
   "status": "scheduled"
 }
+```
 Válasz: 201 Created + appointment objektum
 
 PUT `/appointments/{id}` — teljes frissítés (admin vagy a saját patient-je)
@@ -118,11 +125,12 @@ DELETE `/appointments/{id}` — törlés (admin vagy a saját patient-je)
 ---
 
 ## Példa hibaválasz (érvénytelen token)
+```
 Response: 401 Unauthorized
 {
   "message": "Invalid token"
 }
-
+```
 ---
 
 ## Tesztelés (gyors tippek)
