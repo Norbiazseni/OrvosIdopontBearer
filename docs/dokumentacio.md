@@ -58,24 +58,44 @@ Accept: application/json
 
 ## Patients (páciensek)
 
+<img width="271" height="142" alt="image" src="https://github.com/user-attachments/assets/32f1ea7a-bb1c-430d-8880-ab186eded42a" />
+
+
 GET `/patients` — lista
-- admin: minden pacient
+- admin: mindenkit lát
 - user: csak saját record (feltételezve user.id = patient.id)
 
-GET `/patients/{id}` — részletek (403, ha nincs jogosultság)
+GET `/patients/{id}` — részletek a páciensről (403, ha nincs jogosultság)
 
-POST `/patients` — létrehozás (csak admin)
+POST `/patients` — létrehozás (csak admin tud létrehozni)
+
 Body (példa):
 ```
 {
-  "name": "Név",
-  "email": "email@example.com",
-  "birth_date": "YYYY-MM-DD"
+  "name": "Norbert Kovács",
+  "email": "norbert@example.com",
+  "birth_date": "2005-01-01"
 }
 ```
 Válasz: 201 Created + patient objektum
+```
+{
+    "name": "Norbert Kovács",
+    "email": "norbert@example.com",
+    "birth_date": "2005-01-01",
+    "updated_at": "2025-12-04T09:50:41.000000Z",
+    "created_at": "2025-12-04T09:50:41.000000Z",
+    "id": 11
+}
+```
 
 PUT `/patients/{id}` — teljes frissítés (csak admin)
+```
+{
+  "name": "Norbert Kovács Updated",
+  "email": "norbert_new@example.com"
+}
+```
 
 DELETE `/patients/{id}` — törlés (csak admin)
 
