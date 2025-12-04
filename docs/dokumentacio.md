@@ -121,7 +121,8 @@ Body:
 Válasz: 201 Created + appointment objektum
 
 PUT `/appointments/{id}` — teljes frissítés (admin vagy a saját patient-je)
-PATCH is supported via same endpoint if implemented
+
+
 DELETE `/appointments/{id}` — törlés (admin vagy a saját patient-je)
 
 ---
@@ -135,19 +136,136 @@ Response: 401 Unauthorized
 ```
 ---
 
-## Tesztelés (gyors tippek)
+## Tesztelés
 
 - Factories és seederek használata: database/seeders/DatabaseSeeder.php és factories mappában.
+### Factory-k:
+
+-AppointmentFactory.php
+
+```
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\Appointment;
+use App\Models\Patient;
+use App\Models\Doctor;
+
+class AppointmentFactory extends Factory
+{
+    protected $model = Appointment::class;
+
+    public function definition()
+    {
+        return [
+            'patient_id' => Patient::factory(),   // új Patient rekordot ad hozzá
+            'doctor_id' => Doctor::factory(),     // új Doctor rekordot ad hozzá
+            'appointment_time' => $this->faker->dateTimeBetween('+1 days', '+1 month'),
+            'status' => $this->faker->randomElement(['scheduled','completed','cancelled']),
+        ];
+    }
+
+}
+```
+Az AppointmentFactory automatikusan létrehoz időpontokat a teszteléshez vagy seedeléshez. Minden új rekordhoz új pácienst és orvost generál, valamint véletlenszerű időpontot és státuszt rendel (scheduled, completed, cancelled).
+
+-DoctorFactory.php
+
+```
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\Doctor;
+
+class DoctorFactory extends Factory
+{
+    protected $model = Doctor::class;
+
+    public function definition()
+    {
+        return [
+            'name' => $this->faker->name(),
+            'specialization' => $this->faker->word(),
+            'room' => $this->faker->numberBetween(100, 500),
+        ];
+    }
+}
+
+?>
+```
+Ez a DoctorFactory automatikusan létrehoz orvosokat teszteléshez vagy seedeléshez, véletlenszerű nevet, szakterületet és szobaszámot rendel minden új rekordhoz.
+
+-PatientFactory.php
+
+```
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
+use App\Models\Patient;
+
+class PatientFactory extends Factory
+{
+    protected $model = Patient::class;
+
+    public function definition()
+    {
+        return [
+            'name' => $this->faker->name,
+            'email' => $this->faker->unique()->safeEmail,
+            'birth_date' => $this->faker->date(),
+        ];
+    }
+}
+
+?>
+```
+Ez a PatientFactory automatikusan létrehoz pácienseket teszteléshez vagy seedeléshez, véletlenszerű nevet, egyedi e-mail címet és születési dátumot generálva minden új rekordhoz.
+
+-UserFactory.php
+
+```
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
+use App\Models\User;
+
+class UserFactory extends Factory
+{
+    protected $model = User::class;
+
+    public function definition()
+    {
+        return [
+            'name' => $this->faker->name(),
+            'email' => $this->faker->unique()->safeEmail,
+            'email_verified_at' => now(),
+            'password' => bcrypt('password'), // jelszó minden usernek: password
+            'remember_token' => Str::random(10),
+            'role' => 'user', // alap user, admin a seederben külön
+        ];
+    }
+
+    // Admin állapot
+    public function admin()
+    {
+        return $this->state(fn () => ['role' => 'admin']);
+    }
+}
+
+```
+Ez a UserFactory automatikusan létrehoz felhasználókat teszteléshez vagy seedeléshez. Minden usernek ad egy nevet, egyedi e-mail címet, alap jelszót (password), valamint egy role mezőt (user), és tartalmaz egy admin helper-t is, amivel könnyen készíthetünk admin jogosultságú felhasználót a seederben.
+
 - Futtatás helyben: php artisan migrate:fresh --seed majd php artisan test
 - Tesztek API hívásokat imitálnak: actingAs($user) vagy tokennel withHeaders(['Authorization' => 'Bearer '.$token])
 
----
 
-## Megjegyzések / Tippek fejlesztéshez
-
-- User modell tartalmazza a role mezőt (alap: 'user', admin: 'admin').
-- AuthController jelenleg egyszerű token visszaadást használ: createToken(...)->plainTextToken.
-- Figyelj a migrations sorendjére: patients és doctors táblák legyenek létrehozva az appointments előtt (foreign key miatt).
-- Ha user és patient külön entitás, fontold meg a relációk és jogosultságok pontosítását (pl. user->patient relation).
-
----
