@@ -51,8 +51,6 @@ Accept: application/json
 
 <img width="656" height="467" alt="image" src="https://github.com/user-attachments/assets/7f388b5a-17d0-4b65-a371-acd8df1abb71" />
 
-
-
 ---
 
 ## Patients (páciensek)
