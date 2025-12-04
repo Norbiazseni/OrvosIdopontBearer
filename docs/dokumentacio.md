@@ -136,12 +136,12 @@ Response: 401 Unauthorized
 ```
 ---
 
-## Tesztelés
+## Factory, Seedelés és Tesztelés
 
 - Factories és seederek használata: database/seeders/DatabaseSeeder.php és factories mappában.
 ### Factory-k:
 
--AppointmentFactory.php
+**-AppointmentFactory.php**
 
 ```
 <?php
@@ -171,7 +171,7 @@ class AppointmentFactory extends Factory
 ```
 Az AppointmentFactory automatikusan létrehoz időpontokat a teszteléshez vagy seedeléshez. Minden új rekordhoz új pácienst és orvost generál, valamint véletlenszerű időpontot és státuszt rendel (scheduled, completed, cancelled).
 
--DoctorFactory.php
+**-DoctorFactory.php**
 
 ```
 <?php
@@ -199,7 +199,7 @@ class DoctorFactory extends Factory
 ```
 Ez a DoctorFactory automatikusan létrehoz orvosokat teszteléshez vagy seedeléshez, véletlenszerű nevet, szakterületet és szobaszámot rendel minden új rekordhoz.
 
--PatientFactory.php
+**-PatientFactory.php**
 
 ```
 <?php
@@ -228,7 +228,7 @@ class PatientFactory extends Factory
 ```
 Ez a PatientFactory automatikusan létrehoz pácienseket teszteléshez vagy seedeléshez, véletlenszerű nevet, egyedi e-mail címet és születési dátumot generálva minden új rekordhoz.
 
--UserFactory.php
+**-UserFactory.php**
 
 ```
 <?php
@@ -264,6 +264,56 @@ class UserFactory extends Factory
 
 ```
 Ez a UserFactory automatikusan létrehoz felhasználókat teszteléshez vagy seedeléshez. Minden usernek ad egy nevet, egyedi e-mail címet, alap jelszót (password), valamint egy role mezőt (user), és tartalmaz egy admin helper-t is, amivel könnyen készíthetünk admin jogosultságú felhasználót a seederben.
+
+## Seedelés:
+
+Ez a DatabaseSeeder felelős az adatbázis feltöltéséért tesztelés vagy fejlesztés során. Létrehoz:
+
+1. Felhasználókat – 3 admin és 3 normál user.
+2. Pácienseket – 10 darab véletlenszerű rekord.
+3. Orvosokat – 5 darab véletlenszerű rekord.
+4. Időpontokat – 20 darab foglalás, ahol a patient_id és doctor_id már létező páciensekből és orvosokból kerül kiválasztásra, így valódi kapcsolatok jönnek létre az adatok között.
+
+
+```
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use App\Models\User;
+use App\Models\Patient;
+use App\Models\Doctor;
+use App\Models\Appointment;
+
+class DatabaseSeeder extends Seeder
+{
+    public function run()
+    {
+        // 1️⃣ USERS
+        User::factory()->count(3)->admin()->create(); // 3 admin
+        User::factory()->count(3)->create();         // 3 normál user
+
+        // 2️⃣ PATIENTS
+        $patients = Patient::factory()->count(10)->create();
+
+        // 3️⃣ DOCTORS
+        $doctors = Doctor::factory()->count(5)->create();
+
+        // 4️⃣ APPOINTMENTS
+        // Már létező patient/doctor rekordokból választ
+        Appointment::factory()->count(20)->create([
+            'patient_id' => function () use ($patients) {
+                return $patients->random()->id;
+            },
+            'doctor_id' => function () use ($doctors) {
+                return $doctors->random()->id;
+            }
+        ]);
+    }
+}
+```
+
 
 - Futtatás helyben: php artisan migrate:fresh --seed majd php artisan test
 - Tesztek API hívásokat imitálnak: actingAs($user) vagy tokennel withHeaders(['Authorization' => 'Bearer '.$token])
