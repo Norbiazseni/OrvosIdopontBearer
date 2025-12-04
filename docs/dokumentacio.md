@@ -6,7 +6,8 @@ Rövid, tömör API dokumentáció a projekt végpontjaihoz és használatához.
 
 ## Általános
 
-- Base URL (példa helyben): `http://localhost/orvosIdopontBearer/public/api`
+- Base URL: `http://localhost/orvosIdopontBearer/public/api`
+- Adatbázis neve: orvos_idopont_bearer
 - Auth: Bearer token (Laravel Sanctum). A token a `/login` végponttal szerezhető be.
 - Hibák:
   - 400 Bad Request — rossz kérés
