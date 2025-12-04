@@ -354,7 +354,29 @@ class DatabaseSeeder extends Seeder
 
 <img width="647" height="132" alt="image" src="https://github.com/user-attachments/assets/28ab8f3b-61fd-4d49-ac75-87715e4e9cf8" />
 
+-AppointmentTest.php
+
+1. admin_can_create_appointment()
+2. normal_user_cannot_create_appointment()
+3. can_get_appointments_list()
+4. admin_can_update_appointment()
+5. admin_can_delete_appointment()
+
+-DoctorTest.php
+
+1. admin_can_create_doctor()
+2. normal_user_cannot_create_doctor()
+3. can_get_doctors_list()
+
+-PatientTest.php
+
+1. admin_can_create_patient()
+2. normal_user_cannot_create_patient()
+3. can_get_patients_list()
+
 12 tesztet tartalmaz, melyek közül mind sikerrel lefut.
+
+
 
 
 
