@@ -71,6 +71,7 @@ Body (példa):
 Válasz: 201 Created + patient objektum
 
 PUT `/patients/{id}` — teljes frissítés (csak admin)
+
 DELETE `/patients/{id}` — törlés (csak admin)
 
 ---
@@ -91,6 +92,7 @@ Body:
 ```
 
 PUT `/doctors/{id}` — módosítás (csak admin)
+
 DELETE `/doctors/{id}` — törlés (csak admin)
 
 ---
