@@ -1,6 +1,6 @@
 # OrvosIdopontBearer REST API — Dokumentáció
 
-Rövid, tömör API dokumentáció a projekt végpontjaihoz és használatához.
+OrvosIdopontBearer — egy Laravel alapú REST API alkalmazás, amely orvosi páciensek, orvosok és időpontok kezelésére szolgál. 
 
 ---
 
@@ -17,6 +17,47 @@ Rövid, tömör API dokumentáció a projekt végpontjaihoz és használatához.
   - 500+ — szerverhiba
 
 ---
+
+## Adatmodell
+
+### User (Felhasználó)
+- `id`: Elsődleges kulcs  
+- `name`: Felhasználó teljes neve  
+- `email`: E-mail cím (egyedi)  
+- `email_verified_at`: E-mail ellenőrzés időbélyege *(nullable)*  
+- `password`: Hash-elt jelszó  
+- `remember_token`: Session / remember token *(nullable)*  
+- `created_at`, `updated_at`: Időbélyegek  
+
+---
+
+### Patient (Páciens)
+- `id`: Elsődleges kulcs  
+- `name`: Páciens neve
+- `email`: Páciens email címe
+- `birth_date`: Születési dátum *(nullable)*  
+- `created_at`, `updated_at`: Időbélyegek  
+
+---
+
+### Doctor (Orvos)
+- `id`: Elsődleges kulcs   
+- `name`: Orvos neve  
+- `specialization`: Szakvizsga / specializáció *(nullable)*
+- - `room`: Szoba megnevezése
+- `created_at`, `updated_at`: Időbélyegek  
+
+---
+
+### Appointment (Időpont)
+- `id`: Elsődleges kulcs  
+- `patient_id`: Foglaláshoz tartozó páciens *(FK)*  
+- `doctor_id`: Kapcsolódó orvos *(FK)*  
+- `status`: Státusz (pl. `pending`, `confirmed`, `completed`, `cancelled`)  
+- `created_at`, `updated_at`: Időbélyegek  
+
+
+
 
 ## Nem védett végpontok
 
@@ -167,6 +208,29 @@ Response: 401 Unauthorized
   "message": "Invalid token"
 }
 ```
+
+### Hitelesítés és Jogosultságok 
+
+### Token-alapú Autentifikáció
+- Minden hitelesített végpont `Authorization: Bearer {token}` header-t igényel
+- A token bejelentkezéskor jön vissza
+- A tokeneket a `personal_access_tokens` táblában tároljuk
+
+### Szerepek
+
+1. **Normál felhasználó** (`role = user`)
+   - Saját profil megtekintése és módosítása
+   - Erőforrások megtekintése
+   - Saját foglalások létrehozása, olvasása és törlése (CRUD részben)
+   - Foglalások státusza nem módosítható
+
+2. **Adminisztrátor** (`role = admin`)
+   - Összes felhasználó kezelése
+   - Erőforrások teljes kezelése (pl. páciensek, orvosok, időpontok)
+   - Összes foglalás megtekintése és kezelése
+   - Foglalás státuszának módosítása
+
+
 ---
 
 ## Factory, Seedelés és Tesztelés
@@ -233,7 +297,7 @@ class DoctorFactory extends Factory
 
 ?>
 ```
-Ez a DoctorFactory automatikusan létrehoz orvosokat teszteléshez vagy seedeléshez, véletlenszerű nevet, szakterületet és szobaszámot rendel minden új rekordhoz.
+A DoctorFactory automatikusan létrehoz orvosokat teszteléshez vagy seedeléshez, véletlenszerű nevet, szakterületet és szobaszámot rendel minden új rekordhoz.
 
 **-PatientFactory.php**
 
@@ -262,7 +326,7 @@ class PatientFactory extends Factory
 
 ?>
 ```
-Ez a PatientFactory automatikusan létrehoz pácienseket teszteléshez vagy seedeléshez, véletlenszerű nevet, egyedi e-mail címet és születési dátumot generálva minden új rekordhoz.
+A PatientFactory automatikusan létrehoz pácienseket teszteléshez vagy seedeléshez, véletlenszerű nevet, egyedi e-mail címet és születési dátumot generálva minden új rekordhoz.
 
 **-UserFactory.php**
 
@@ -299,7 +363,7 @@ class UserFactory extends Factory
 }
 
 ```
-Ez a UserFactory automatikusan létrehoz felhasználókat teszteléshez vagy seedeléshez. Minden usernek ad egy nevet, egyedi e-mail címet, alap jelszót (password), valamint egy role mezőt (user), és tartalmaz egy admin helper-t is, amivel könnyen készíthetünk admin jogosultságú felhasználót a seederben.
+A UserFactory automatikusan létrehoz felhasználókat teszteléshez vagy seedeléshez. Minden usernek ad egy nevet, egyedi e-mail címet, alap jelszót (password), valamint egy role mezőt (user), és tartalmaz egy admin helper-t is, amivel könnyen készíthetünk admin jogosultságú felhasználót a seederben.
 
 ## Seedelés:
 
@@ -350,9 +414,12 @@ class DatabaseSeeder extends Seeder
 }
 ```
 
+**Seedelés futtatása**: `php artisan db:seed`
+
 ## Tesztelés
 
 <img width="647" height="132" alt="image" src="https://github.com/user-attachments/assets/28ab8f3b-61fd-4d49-ac75-87715e4e9cf8" />
+
 
 -AppointmentTest.php
 
@@ -376,6 +443,7 @@ class DatabaseSeeder extends Seeder
 
 11 (+1 próbateszt) tesztet tartalmaz, melyek közül mind sikerrel lefut.
 
+**Tesztek futtatása**: `php artisan test`
 
 
 
