@@ -44,7 +44,7 @@ OrvosIdopontBearer — egy Laravel alapú REST API alkalmazás, amely orvosi pá
 - `id`: Elsődleges kulcs   
 - `name`: Orvos neve  
 - `specialization`: Szakvizsga / specializáció *(nullable)*
-- - `room`: Szoba megnevezése
+- `room`: Szoba megnevezése
 - `created_at`, `updated_at`: Időbélyegek  
 
 ---
