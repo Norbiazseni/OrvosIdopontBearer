@@ -356,25 +356,25 @@ class DatabaseSeeder extends Seeder
 
 -AppointmentTest.php
 
-1. admin_can_create_appointment()
-2. normal_user_cannot_create_appointment()
-3. can_get_appointments_list()
-4. admin_can_update_appointment()
-5. admin_can_delete_appointment()
+1. admin_can_create_appointment() - Egy admin felhasználó sikeresen létre tud-e hozni egy új időpontot.
+2. normal_user_cannot_create_appointment() - Egy sima (nem admin) felhasználó nem hozhat létre időpontot.
+3. can_get_appointments_list() - Egy admin le tudja-e kérni az összes időpontot az API-n keresztül.
+4. admin_can_update_appointment() - Az admin módosíthatja egy létező időpont adatait.
+5. admin_can_delete_appointment() - Az admin jogosult-e időpontot törölni.
 
 -DoctorTest.php
 
-1. admin_can_create_doctor()
-2. normal_user_cannot_create_doctor()
-3. can_get_doctors_list()
+1. admin_can_create_doctor() - Egy admin felhasználó képes-e új orvost létrehozni az API-n keresztül.
+2. normal_user_cannot_create_doctor() - Egy normál (nem admin) felhasználó ne tudjon új orvost létrehozni.
+3. can_get_doctors_list() - Egy admin le tudja-e kérni az összes orvost az API-n keresztül.
 
 -PatientTest.php
 
-1. admin_can_create_patient()
-2. normal_user_cannot_create_patient()
-3. can_get_patients_list()
+1. admin_can_create_patient() - Egy admin felhasználó képes-e új pácienst létrehozni az API-n keresztül.
+2. normal_user_cannot_create_patient() - Egy normál (nem admin) felhasználó ne hozhasson létre új pácienst.
+3. can_get_patients_list() - Egy admin le tudja-e kérni az összes pácienst az API-ból.
 
-12 tesztet tartalmaz, melyek közül mind sikerrel lefut.
+11 (+1 próbateszt) tesztet tartalmaz, melyek közül mind sikerrel lefut.
 
 
 
