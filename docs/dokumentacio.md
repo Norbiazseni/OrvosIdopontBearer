@@ -87,7 +87,9 @@ Példa válasz:
 ## Védett végpontok (auth:sanctum)
 
 Fejléc:
+
 Authorization: Bearer {token}
+
 Accept: application/json
 
 Általános jogosultságok:
