@@ -69,6 +69,7 @@ OrvosIdopontBearer — egy Laravel alapú REST API alkalmazás, amely orvosi pá
 
 
 Példa /login kérés:
+
 Content-Type: application/json
 ```
 Body:
