@@ -91,7 +91,7 @@ OrvosIdopontBearer — egy Laravel alapú REST API alkalmazás, amely orvosi pá
   
 
 
-Minden modellnél soft delete alkalmazva, csak kitöröltnek látszik az adat, valójában nem az.
+Minden modellnél és migrációnál soft delete alkalmazva, csak kitöröltnek látszik az adat, valójában nem az.
 
 Példa:
 
