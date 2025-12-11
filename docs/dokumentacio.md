@@ -418,7 +418,7 @@ class UserFactory extends Factory
 A UserFactory automatikusan létrehoz felhasználókat teszteléshez vagy seedeléshez. Minden usernek ad egy nevet, egyedi e-mail címet, alap jelszót (password), valamint egy role mezőt (user), és tartalmaz egy admin helper-t is, amivel könnyen készíthetünk admin jogosultságú felhasználót a seederben.
 
 
-##Controllerek
+## Controllerek
 
 **-AuthController.php**
 
