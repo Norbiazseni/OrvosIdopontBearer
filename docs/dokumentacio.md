@@ -285,7 +285,7 @@ Response: 401 Unauthorized
 
 ---
 
-## Factory, Seedelés és Tesztelés
+## Factory, Controller, Seedelés és Tesztelés
 
 - Factories és seederek használata: database/seeders/DatabaseSeeder.php és factories mappában.
 - Futtatás helyben: php artisan migrate:fresh --seed majd php artisan test
@@ -416,6 +416,356 @@ class UserFactory extends Factory
 
 ```
 A UserFactory automatikusan létrehoz felhasználókat teszteléshez vagy seedeléshez. Minden usernek ad egy nevet, egyedi e-mail címet, alap jelszót (password), valamint egy role mezőt (user), és tartalmaz egy admin helper-t is, amivel könnyen készíthetünk admin jogosultságú felhasználót a seederben.
+
+
+##Controllerek
+
+**-AuthController.php**
+
+```
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use App\Models\User;
+
+class AuthController extends Controller
+{
+    // REGISTER
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required|email|unique:users',
+            'password' => 'required'
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password)
+        ]);
+
+        return response()->json(['user' => $user], 201);
+    }
+
+    // LOGIN
+    public function login(Request $request)
+    {
+        $request->validate([
+            'email' => 'required',
+            'password' => 'required'
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json(['error' => 'Invalid credentials'], 401);
+        }
+
+        // Token generálás
+        $token = $user->createToken('api-token')->plainTextToken;
+
+        return response()->json(['token' => $token]);
+    }
+
+    // LOGOUT
+    public function logout(Request $request)
+    {
+        $request->user()->tokens()->delete();
+
+        return response()->json(['message' => 'Logged out']);
+    }
+}
+
+```
+
+Az AuthController kezeli a felhasználók regisztrációját, bejelentkezését és kijelentkezését.
+
+**-DoctorController.php**
+
+```
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Models\Doctor;
+
+class DoctorController extends Controller
+{
+    // Listázás
+    public function index(Request $request)
+    {
+        $user = $request->user();
+        $query = Doctor::query();
+
+        // USER-ek ne módosíthassák, de láthatják az összes orvost
+        // Ha akarjuk, csak admin láthat mindent, usernek csak listázás
+        return response()->json($query->get());
+    }
+
+    // Egy orvos lekérése
+    public function show($id)
+    {
+        $doctor = Doctor::findOrFail($id);
+        return response()->json($doctor);
+    }
+
+    // Új orvos létrehozása (csak admin)
+    public function store(Request $request)
+    {
+        $user = $request->user();
+        if ($user->role !== 'admin') {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $data = $request->validate([
+            'name' => 'required|string',
+            'specialization' => 'required|string',
+            'room' => 'required|string',
+        ]);
+
+        $doctor = Doctor::create($data);
+        return response()->json($doctor, 201);
+    }
+
+    // Orvos adatainak módosítása (csak admin)
+    public function update(Request $request, $id)
+    {
+        $user = $request->user();
+        if ($user->role !== 'admin') {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $doctor = Doctor::findOrFail($id);
+
+        $data = $request->validate([
+            'name' => 'sometimes|string',
+            'specialization' => 'sometimes|string',
+            'room' => 'sometimes|string',
+        ]);
+
+        $doctor->update($data);
+        return response()->json($doctor);
+    }
+
+    // Orvos törlése (csak admin)
+    public function destroy(Request $request, $id)
+    {
+        $user = $request->user();
+        if ($user->role !== 'admin') {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $doctor = Doctor::findOrFail($id);
+        $doctor->delete();
+
+        return response()->json(['message' => 'Deleted']);
+    }
+}
+
+```
+A DoctorController kezeli az orvosok adatait az API-n keresztül. Bárki lekérdezheti az orvosok listáját vagy egy konkrét orvos adatait, de új orvos létrehozása, módosítása vagy törlése csak admin jogosultsággal lehetséges
+
+**-PatientController.php**
+
+```
+
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Models\Patient;
+
+class PatientController extends Controller
+{
+    public function index(Request $request)
+    {
+        $user = $request->user();
+
+        $query = Patient::query();
+
+        if ($user->role !== 'admin') {
+            // User csak a saját recordját látja, feltételezzük user_id = patient_id
+            $query->where('id', $user->id);
+        }
+
+        return response()->json($query->get());
+    }
+
+    public function show(Request $request, $id)
+    {
+        $user = $request->user();
+        $patient = Patient::findOrFail($id);
+
+        if ($user->role !== 'admin' && $patient->id !== $user->id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        return response()->json($patient);
+    }
+
+    public function store(Request $request)
+    {
+        $user = $request->user();
+        if ($user->role !== 'admin') {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $data = $request->validate([
+            'name' => 'required|string',
+            'email' => 'required|email|unique:patients',
+            'birth_date' => 'required|date'
+        ]);
+
+        $patient = Patient::create($data);
+        return response()->json($patient, 201);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $user = $request->user();
+        $patient = Patient::findOrFail($id);
+
+        if ($user->role !== 'admin') {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $data = $request->validate([
+            'name' => 'sometimes|string',
+            'email' => 'sometimes|email|unique:patients,email,'.$id,
+            'birth_date' => 'sometimes|date'
+        ]);
+
+        $patient->update($data);
+        return response()->json($patient);
+    }
+
+    public function destroy(Request $request, $id)
+    {
+        $user = $request->user();
+        if ($user->role !== 'admin') {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $patient = Patient::findOrFail($id);
+        $patient->delete();
+        return response()->json(['message' => 'Deleted']);
+    }
+}
+
+```
+
+A PatientController kezeli a páciens adatait az API-n keresztül. Admin felhasználók teljes hozzáféréssel létrehozhatnak, módosíthatnak és törölhetnek pácienseket, míg normál felhasználók csak a saját adataikat láthatják és kérhetik le, a jogosultságokat minden műveletnél ellenőrzi.
+
+**-AppointmentController.php**
+
+```
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Models\Appointment;
+
+class AppointmentController extends Controller
+{
+    public function index(Request $request)
+    {
+        $user = $request->user();
+        $query = Appointment::query();
+
+        if ($user->role !== 'admin') {
+            $query->where('patient_id', $user->id);
+        }
+
+        if ($request->has('doctor_id')) {
+            $query->where('doctor_id', $request->doctor_id);
+        }
+
+        if ($request->has('status')) {
+            $query->where('status', $request->status);
+        }
+
+        return response()->json($query->get());
+    }
+
+    public function show(Request $request, $id)
+    {
+        $user = $request->user();
+        $appointment = Appointment::findOrFail($id);
+
+        if ($user->role !== 'admin' && $appointment->patient_id !== $user->id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        return response()->json($appointment);
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'patient_id' => 'required|exists:patients,id',
+            'doctor_id' => 'required|exists:doctors,id',
+            'appointment_time' => 'required|date',
+            'status' => 'required|string',
+        ]);
+
+        // Csak admin hozhat létre időpontot
+        if(auth()->user()->role !== 'admin') {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        $appointment = Appointment::create($request->all());
+
+        return response()->json($appointment, 201);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $user = $request->user();
+        $appointment = Appointment::findOrFail($id);
+
+        if ($user->role !== 'admin' && $appointment->patient_id !== $user->id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $data = $request->validate([
+            'doctor_id' => 'sometimes|integer',
+            'appointment_time' => 'sometimes|date',
+            'status' => 'sometimes|string'
+        ]);
+
+        $appointment->update($data);
+        return response()->json($appointment);
+    }
+
+    public function destroy(Request $request, $id)
+    {
+        $user = $request->user();
+        $appointment = Appointment::findOrFail($id);
+
+        if ($user->role !== 'admin' && $appointment->patient_id !== $user->id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $appointment->delete();
+        return response()->json(['message' => 'Deleted']);
+    }
+}
+
+
+```
+
+Az AppointmentController kezeli az időpontok API-n keresztüli CRUD műveleteit.
+
 
 ## Seedelés:
 
