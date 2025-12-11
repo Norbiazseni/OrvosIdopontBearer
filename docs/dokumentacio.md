@@ -120,7 +120,7 @@ Fejléc:
 - Content-Type: application/json
 - Accept: application/json
 
-Példa /login kérés:
+Példa /login kérésre:
 
 
 ```
