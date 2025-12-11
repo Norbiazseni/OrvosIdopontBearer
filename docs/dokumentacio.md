@@ -116,10 +116,13 @@ class Patient extends Model
 
 <img width="564" height="281" alt="image" src="https://github.com/user-attachments/assets/6fc19004-4f96-4831-bf96-7c4020a6fca1" />
 
+Fejléc:
+- Content-Type: application/json
+- Accept: application/json
 
 Példa /login kérés:
 
-Content-Type: application/json
+
 ```
 Body:
 {
@@ -136,10 +139,8 @@ Példa válasz:
 ## Védett végpontok (auth:sanctum)
 
 Fejléc:
-
-Authorization: Bearer {token}
-
-Accept: application/json
+- Authorization: Bearer {token}
+- Accept: application/json
 
 Általános jogosultságok:
 - admin: minden erőforrást lát/kezel
