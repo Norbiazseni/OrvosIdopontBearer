@@ -74,7 +74,7 @@ OrvosIdopontBearer — egy Laravel alapú REST API alkalmazás, amely orvosi pá
 +-------------------------+
                                                                    1
                                                    +-------------------------------------+
-                                                   |              appointments            |
+                                                   |              appointments           |
                                                    +-------------------------------------+
                                                    | id (PK)                             |
                                                    | patient_id (FK → patients.id)       |
