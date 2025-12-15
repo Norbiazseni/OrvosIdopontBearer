@@ -767,6 +767,151 @@ class AppointmentController extends Controller
 
 Az AppointmentController kezeli az időpontok API-n keresztüli CRUD műveleteit.
 
+## Modellek
+
+**-Appointment.php**
+
+```
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class Appointment extends Model
+{
+    use HasFactory; // <-- EZ FONTOS
+    use SoftDeletes;
+
+    protected $fillable = ['patient_id', 'doctor_id', 'appointment_time', 'status'];
+
+    public function patient()
+    {
+        return $this->belongsTo(Patient::class);
+    }
+
+    public function doctor()
+    {
+        return $this->belongsTo(Doctor::class);
+    }
+}
+
+```
+Az Appointment (Időpont) modell az időpontfoglalásokat reprezentálja az alkalmazásban.
+Támogatja a factory-ket (teszteléshez/seedeléshez), a soft delete-et (törléskor nem törli végleg az adatot), és kapcsolatban áll egy Patient-tel és egy Doctor-ral (belongsTo), miközben csak a megadott mezők tölthetők tömegesen ($fillable).
+
+**-Doctor.php**
+
+```
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class Doctor extends Model
+{
+    use HasFactory; // FONTOS
+    use SoftDeletes;
+
+    protected $fillable = ['name', 'specialization', 'room'];
+}
+
+```
+
+A Doctor (Orvos) modell az orvosokat kezeli az alkalmazásban.
+Támogatja a factory-ket (teszteléshez/seedeléshez), a soft delete-et (logikai törlés), és csak a megadott mezők (name, specialization, room) tölthetők fel tömegesen ($fillable).
+
+**-Patient.php**
+
+```
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class Patient extends Model
+{
+    use HasFactory; // EZ FONTOS
+    use SoftDeletes;
+
+    protected $fillable = ['name', 'email', 'birth_date'];
+}
+
+?>
+
+```
+
+A Patient (Páciens) modell a páciensek adatainak kezeléséért felel.
+Támogatja a factory-ket (tesztelés/seedelés), a soft delete-et (logikai törlés), és csak a megadott mezők (name, email, birth_date) tölthetők fel tömegesen ($fillable).
+
+**-User.php**
+
+```
+
+<?php
+
+namespace App\Models;
+
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+
+class User extends Authenticatable
+{
+    /** @use HasFactory<\Database\Factories\UserFactory> */
+    use HasFactory, Notifiable, HasApiTokens, SoftDeletes;;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var list<string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+}
+
+```
+A User (Felhasználó) modell kezeli az alkalmazás felhasználóit és az autentikációt.
+Támogatja az API tokenes beléptetést (Sanctum), a factory-ket, az értesítéseket, valamint a soft delete-et; a jelszó rejtett és automatikusan hash-elve kerül mentésre.
 
 ## Seedelés:
 
